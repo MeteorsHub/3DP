@@ -8,13 +8,12 @@ MainGLWidget::MainGLWidget(QWidget *parent)
 {
 	obj_model = nullptr;
 	wired = false;
+	projection_angle = 45.0;
 
 	leftBtnClk = false;
 	rightBtnClk = false;
 	leftBtnLastPos = QPoint(0, 0);
 	rightBtnLastPos = QPoint(0, 0);
-
-	scaled = QVector3D(1.0, 1.0, 1.0);
 	translated = QVector3D(0, 0, 0);
 	rotated = QVector3D(0, 0, 0);
 }
@@ -37,7 +36,6 @@ void MainGLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	glScaled()
 	glTranslated(translated.x()/100, -translated.y()/100, translated.z());
 	if (obj_model != nullptr) {
 		for (int i = 0; i < obj_model->getNumFaces3(); i++) {
@@ -70,7 +68,7 @@ void MainGLWidget::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (float)w / h, 0.01, 100.0);
+	gluPerspective(projection_angle, (float)w / h, 0.01, 100.0);
 	updateGL();
 }
 
@@ -130,8 +128,7 @@ void MainGLWidget::mouseMoveEvent(QMouseEvent *event)
 // zoom the model
 void MainGLWidget::wheelEvent(QWheelEvent *event)
 {
-	double scaler = 1.0 + event->angleDelta().y() / 240;
-	scaled = QVector3D(scaler, scaler, scaler);
-	updateGL();
+	projection_angle = std::min(160.0, std::max(1.0, projection_angle - double(event->angleDelta().y()) / 60));
 	qDebug() << "wheel angle: " << event->angleDelta().x() << " " << event->angleDelta().y();
+	resizeGL(size().width(), size().height());
 }

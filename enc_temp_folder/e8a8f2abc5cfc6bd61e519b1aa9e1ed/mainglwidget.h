@@ -24,6 +24,7 @@ public:
 
 	ObjModel *obj_model;
 	bool wired;
+	double projection_angle;
 
 protected:
 	
@@ -35,7 +36,6 @@ private:
 	QPoint leftBtnLastPos;
 	QPoint rightBtnLastPos;
 
-	QVector3D scaled;
 	QVector3D translated;
 	QVector3D rotated;
 };

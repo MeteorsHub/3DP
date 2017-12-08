@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dp.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.3
+** Created by: Qt User Interface Compiler version 5.9.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -91,6 +91,8 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(mainglwidget->sizePolicy().hasHeightForWidth());
         mainglwidget->setSizePolicy(sizePolicy);
+        mainglwidget->setMouseTracking(false);
+        mainglwidget->setFocusPolicy(Qt::StrongFocus);
 
         gridLayout->addWidget(mainglwidget, 0, 1, 1, 1);
 
