@@ -40,7 +40,7 @@ void DP::on_clicked_actionOpen() {
 
 void DP::on_checked_WiredCheckBox(bool wired)
 {
-	this->ui.mainglwidget->wired = wired;
+	this->ui.mainglwidget->toggleWired = wired;
 	this->ui.mainglwidget->updateGL();
 }
 

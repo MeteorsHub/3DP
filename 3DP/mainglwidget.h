@@ -23,7 +23,8 @@ public:
 	void wheelEvent(QWheelEvent*) override;
 
 	ObjModel *obj_model;
-	bool wired;
+	bool toggleWired;
+	bool toggleAxes;
 
 protected:
 	

@@ -7,7 +7,8 @@ MainGLWidget::MainGLWidget(QWidget *parent)
 	:QGLWidget(parent)
 {
 	obj_model = nullptr;
-	wired = false;
+	toggleWired = false;
+	toggleAxes = true;
 
 	leftBtnClk = false;
 	rightBtnClk = false;
@@ -38,6 +39,22 @@ void MainGLWidget::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
+	gluLookAt(1, 1, 5, 0, 0, 0, 0, 1, 0);
+
+	if (toggleAxes) {
+		/*  Length of axes */
+		double len = 2.0;
+		glColor3f(0.1, 0.1, 0.7);
+		glBegin(GL_LINES);
+		glVertex3d(0, 0, 0);
+		glVertex3d(len, 0, 0);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, len, 0);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, 0, len);
+		glEnd();
+
+	}
 	if (obj_model != nullptr) {
 		for (int i = 0; i < obj_model->getNumFaces3(); i++) {
 			glColor3f(0.1, 0.1, 0.1);
@@ -47,7 +64,7 @@ void MainGLWidget::paintGL()
 			glVertex3d(obj_model->faces3->at(i).v3.x, obj_model->faces3->at(i).v3.y, obj_model->faces3->at(i).v3.z);
 			glEnd();
 		}
-		if (!wired) {
+		if (!toggleWired) {
 			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
 				glColor3f(0.1, 0.7, 0.1);
 				glBegin(GL_TRIANGLES);
@@ -58,10 +75,6 @@ void MainGLWidget::paintGL()
 			}
 		}
 	}
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
-
 	
 }
 
@@ -71,6 +84,8 @@ void MainGLWidget::resizeGL(int w, int h)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45.0, float(w) / float(h), 0.01, 100.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 	updateGL();
 }
 
