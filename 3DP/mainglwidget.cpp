@@ -36,9 +36,8 @@ void MainGLWidget::initializeGL()
 void MainGLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	glLoadIdentity();
-	glScaled()
-	glTranslated(translated.x()/100, -translated.y()/100, translated.z());
 	if (obj_model != nullptr) {
 		for (int i = 0; i < obj_model->getNumFaces3(); i++) {
 			glColor3f(0.1, 0.1, 0.1);
@@ -61,7 +60,8 @@ void MainGLWidget::paintGL()
 	}
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
+	gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
+
 	
 }
 
@@ -70,7 +70,7 @@ void MainGLWidget::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (float)w / h, 0.01, 100.0);
+	gluPerspective(45.0, float(w) / float(h), 0.01, 100.0);
 	updateGL();
 }
 
@@ -130,7 +130,7 @@ void MainGLWidget::mouseMoveEvent(QMouseEvent *event)
 // zoom the model
 void MainGLWidget::wheelEvent(QWheelEvent *event)
 {
-	double scaler = 1.0 + event->angleDelta().y() / 240;
+	double scaler = scaled.x() + double(event->angleDelta().y()) / 360.0;
 	scaled = QVector3D(scaler, scaler, scaler);
 	updateGL();
 	qDebug() << "wheel angle: " << event->angleDelta().x() << " " << event->angleDelta().y();

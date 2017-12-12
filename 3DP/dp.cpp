@@ -46,7 +46,5 @@ void DP::on_checked_WiredCheckBox(bool wired)
 
 void DP::on_slideMoved_size(int size)
 {
-	this->ui.mainglwidget->projection_angle = 100.0 - size;
-	QSize window_size = this->ui.mainglwidget->size();
-	this->ui.mainglwidget->resizeGL(window_size.width(), window_size.height());
+	
 }
