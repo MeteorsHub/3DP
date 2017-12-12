@@ -24,7 +24,7 @@ public:
 
 	ObjModel *obj_model;
 	bool toggleWired;
-	bool toggleAxes;
+	bool toggleAxis;
 
 protected:
 	
@@ -32,11 +32,10 @@ protected:
 private:
 	QTimer timer;
 	bool leftBtnClk;
-	bool rightBtnClk;
 	QPoint leftBtnLastPos;
-	QPoint rightBtnLastPos;
 
-	QVector3D scaled;
-	QVector3D translated;
-	QVector3D rotated;
+	GLfloat cameraAngle;
+	GLfloat cameraRadius;
+	GLfloat theta;
+	GLfloat phi;
 };

@@ -15,30 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="checkBox">
-        <property name="text">
-         <string>Wired</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="0" column="1">
      <widget class="MainGLWidget" name="mainglwidget" native="true">
       <property name="sizePolicy">
@@ -55,24 +31,53 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <layout class="QHBoxLayout" name="horizontalLayout"/>
-    </item>
-    <item row="2" column="1">
-     <widget class="QSlider" name="horizontalSlider">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="value">
-       <number>50</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Axis</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_2">
+        <property name="text">
+         <string>Display</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Wire</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox">
+        <property name="text">
+         <string>Wired</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -92,7 +97,14 @@
     <addaction name="actionOpen"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionColor"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -121,6 +133,11 @@
    </property>
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionColor">
+   <property name="text">
+    <string>Color</string>
    </property>
   </action>
  </widget>
@@ -176,8 +193,8 @@
    <slot>on_checked_WiredCheckBox(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>34</x>
-     <y>464</y>
+     <x>44</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>35</x>
@@ -186,25 +203,58 @@
    </hints>
   </connection>
   <connection>
-   <sender>horizontalSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <sender>checkBox_2</sender>
+   <signal>clicked(bool)</signal>
    <receiver>DPClass</receiver>
-   <slot>on_slideMoved_size(int)</slot>
+   <slot>on_checked_axisCheckBox(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>501</y>
+     <x>59</x>
+     <y>92</y>
     </hint>
     <hint type="destinationlabel">
-     <x>36</x>
-     <y>506</y>
+     <x>65</x>
+     <y>178</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_checked_wiredCheckBox(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>25</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>22</x>
+     <y>185</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionColor</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>on_clicked_actionOpen()</slot>
-  <slot>on_checked_WiredCheckBox(bool)</slot>
-  <slot>on_slideMoved_size(int)</slot>
+  <slot>on_checked_wiredCheckBox(bool)</slot>
+  <slot>on_checked_axisCheckBox(bool)</slot>
+  <slot>on_clicked_actionColor()</slot>
  </slots>
 </ui>

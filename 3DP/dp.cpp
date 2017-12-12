@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QDebug>
+#include "colorfileloader.h"
 
 DP::DP(QWidget *parent)
 	: QMainWindow(parent)
@@ -38,13 +39,24 @@ void DP::on_clicked_actionOpen() {
 	qDebug() << "Number of faces3 is " << this->obj_model->getNumFaces3();
 }
 
-void DP::on_checked_WiredCheckBox(bool wired)
+void DP::on_clicked_actionColor() 
+{
+	ColorFileLoader dialog;
+	if (dialog.exec() == QDialog::Accepted) {
+		qDebug() << "Color file is " << dialog.getColorFileName();
+		qDebug() << "Color mode is " << dialog.getColorMode();
+	}
+	
+}
+
+void DP::on_checked_wiredCheckBox(bool wired)
 {
 	this->ui.mainglwidget->toggleWired = wired;
 	this->ui.mainglwidget->updateGL();
 }
 
-void DP::on_slideMoved_size(int size)
+void DP::on_checked_axisCheckBox(bool axis)
 {
-	
+	this->ui.mainglwidget->toggleAxis = axis;
+	this->ui.mainglwidget->updateGL();
 }

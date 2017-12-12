@@ -17,7 +17,9 @@ private:
 
 public slots:
 	void on_clicked_actionOpen();
-	void on_checked_WiredCheckBox(bool);
-	void on_slideMoved_size(int);
+	void on_clicked_actionColor();
+
+	void on_checked_wiredCheckBox(bool);
+	void on_checked_axisCheckBox(bool);
 
 };

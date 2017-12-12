@@ -1,23 +1,25 @@
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include "mainglwidget.h"
 #include <GL/glut.h>
 #include <QDebug>
+
+using namespace std;
 
 MainGLWidget::MainGLWidget(QWidget *parent)
 	:QGLWidget(parent)
 {
 	obj_model = nullptr;
 	toggleWired = false;
-	toggleAxes = true;
+	toggleAxis = true;
 
 	leftBtnClk = false;
-	rightBtnClk = false;
 	leftBtnLastPos = QPoint(0, 0);
-	rightBtnLastPos = QPoint(0, 0);
 
-	scaled = QVector3D(1.0, 1.0, 1.0);
-	translated = QVector3D(0, 0, 0);
-	rotated = QVector3D(0, 0, 0);
+	cameraAngle = 40.0;
+	cameraRadius = 4.0;
+	theta = 70.0;
+	phi = 30.0;
 }
 
 void MainGLWidget::bindModel(ObjModel *model)
@@ -39,9 +41,12 @@ void MainGLWidget::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
-	gluLookAt(1, 1, 5, 0, 0, 0, 0, 1, 0);
+	GLfloat cmrX = cameraRadius * sinf(M_PI*theta/180.0) * sinf(M_PI*phi/180.0);
+	GLfloat cmrY = cameraRadius * cosf(M_PI*theta/180.0);
+	GLfloat cmrZ = cameraRadius * sinf(M_PI*theta/180.0) * cosf(M_PI*phi/180.0);
+	gluLookAt(cmrX, cmrY, cmrZ, 0, 0, 0, 0, 1, 0);
 
-	if (toggleAxes) {
+	if (toggleAxis) {
 		/*  Length of axes */
 		double len = 2.0;
 		glColor3f(0.1, 0.1, 0.7);
@@ -83,7 +88,7 @@ void MainGLWidget::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, float(w) / float(h), 0.01, 100.0);
+	gluPerspective(cameraAngle, float(w) / float(h), 0.01, 100.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	updateGL();
@@ -91,16 +96,10 @@ void MainGLWidget::resizeGL(int w, int h)
 
 void MainGLWidget::mousePressEvent(QMouseEvent *event)
 {
-	switch (event->button())
+	if (event->button() == Qt::LeftButton)
 	{
-	case Qt::LeftButton:
-			leftBtnClk = true;
-			leftBtnLastPos = event->pos();
-			break;
-	case Qt::RightButton:
-			rightBtnClk = true;
-			rightBtnLastPos = event->pos();
-			break;
+		leftBtnClk = true;
+		leftBtnLastPos = event->pos();
 	}
 	event->ignore();
 
@@ -108,16 +107,10 @@ void MainGLWidget::mousePressEvent(QMouseEvent *event)
 
 void MainGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	switch (event->button())
+	if (event->button() == Qt::LeftButton)
 	{
-	case Qt::LeftButton:
-			leftBtnClk = false;
-			leftBtnLastPos = QPoint(0, 0);
-			break;
-	case Qt::RightButton:
-			rightBtnClk = false;
-			rightBtnLastPos = QPoint(0, 0);
-			break;
+		leftBtnClk = false;
+		leftBtnLastPos = QPoint(0, 0);
 	}
 	event->ignore();
 }
@@ -128,16 +121,12 @@ void MainGLWidget::mouseMoveEvent(QMouseEvent *event)
 	if (event->buttons() & Qt::LeftButton)
 	{
 		if (leftBtnClk) {
-			translated = translated + QVector3D(event->pos() - leftBtnLastPos);
+			QPoint movement = event->pos() - leftBtnLastPos;
+			theta = min(179.9f, max(0.1f, theta - 0.5f*movement.y()));
+			phi = phi - 0.5f*movement.x();
 			updateGL();
 			qDebug() << "LeftButton:" << (event->pos() - leftBtnLastPos).x() << " " << (event->pos() - leftBtnLastPos).y();
 			leftBtnLastPos = event->pos();
-		}
-	}
-	if (event->buttons() & Qt::RightButton)
-	{
-		if (rightBtnClk) {
-			;
 		}
 	}
 }
@@ -145,8 +134,7 @@ void MainGLWidget::mouseMoveEvent(QMouseEvent *event)
 // zoom the model
 void MainGLWidget::wheelEvent(QWheelEvent *event)
 {
-	double scaler = scaled.x() + double(event->angleDelta().y()) / 360.0;
-	scaled = QVector3D(scaler, scaler, scaler);
-	updateGL();
+	cameraAngle = min(150.0f, max(0.1f, cameraAngle - event->angleDelta().y() / 60.0f));
+	resizeGL(size().width(), size().height());
 	qDebug() << "wheel angle: " << event->angleDelta().x() << " " << event->angleDelta().y();
 }
