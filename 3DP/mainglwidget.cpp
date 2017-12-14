@@ -31,7 +31,11 @@ void MainGLWidget::initializeGL()
 {
 	glClearColor(0.8, 0.8, 0.8, 1);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHT0);
+	//GLfloat lightPos[4] = { 0, 1, 0, 1 };
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	//glEnable(GL_LIGHT0);
+	GLfloat lmodel_ambient[] = { 0.7,0.7,0.7,1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 }
