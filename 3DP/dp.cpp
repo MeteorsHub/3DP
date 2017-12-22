@@ -43,10 +43,14 @@ void DP::on_clicked_actionColor()
 {
 	ColorFileLoader dialog;
 	if (dialog.exec() == QDialog::Accepted) {
-		qDebug() << "Color file is " << dialog.getColorFileName();
-		qDebug() << "Color mode is " << dialog.getColorMode();
+		this->ui.mainglwidget->setColorMode(dialog.getColorMode());
+		if (!this->ui.mainglwidget->loadColor(dialog.getColorFileName())) {
+			QString msg = "File ";
+			msg += dialog.getColorFileName() + " cannot open";
+			QMessageBox::warning(this, "Color loading failed", msg);
+		}
+		this->ui.mainglwidget->updateGL();
 	}
-	
 }
 
 void DP::on_checked_wiredCheckBox(bool wired)

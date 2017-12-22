@@ -22,10 +22,22 @@ MainGLWidget::MainGLWidget(QWidget *parent)
 	phi = 30.0;
 }
 
-void MainGLWidget::bindModel(ObjModel *model)
+bool MainGLWidget::bindModel(ObjModel *model)
 {
 	obj_model = model;
+	return true;
 }
+
+bool MainGLWidget::loadColor(QString filename)
+{
+	return this->obj_model->loadColorFile(filename);
+}
+
+bool MainGLWidget::setColorMode(ColorFileLoader::COLOR_MODE mode)
+{
+	return this->obj_model->setColorMode(mode);
+}
+
 
 void MainGLWidget::initializeGL()
 {
@@ -65,8 +77,8 @@ void MainGLWidget::paintGL()
 
 	}
 	if (obj_model != nullptr) {
+		glColor3f(0.1, 0.1, 0.1);
 		for (int i = 0; i < obj_model->getNumFaces3(); i++) {
-			glColor3f(0.1, 0.1, 0.1);
 			glBegin(GL_LINE_LOOP);
 			glVertex3d(obj_model->faces3->at(i).v1.x, obj_model->faces3->at(i).v1.y, obj_model->faces3->at(i).v1.z);
 			glVertex3d(obj_model->faces3->at(i).v2.x, obj_model->faces3->at(i).v2.y, obj_model->faces3->at(i).v2.z);
@@ -75,7 +87,11 @@ void MainGLWidget::paintGL()
 		}
 		if (!toggleWired) {
 			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
-				glColor3f(0.1, 0.7, 0.1);
+				if (obj_model->getNumColor() != 0) {
+					color3f c = obj_model->color3->at(i);
+					glColor3f(c.red, c.green, c.blue);
+				}
+				else glColor3f(0.1, 0.7, 0.1);
 				glBegin(GL_TRIANGLES);
 				glVertex3d(obj_model->faces3->at(i).v1.x, obj_model->faces3->at(i).v1.y, obj_model->faces3->at(i).v1.z);
 				glVertex3d(obj_model->faces3->at(i).v2.x, obj_model->faces3->at(i).v2.y, obj_model->faces3->at(i).v2.z);

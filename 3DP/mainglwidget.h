@@ -11,7 +11,9 @@ class MainGLWidget: public QGLWidget
 public:
 	explicit MainGLWidget(QWidget *parent = nullptr);
 
-	void bindModel(ObjModel*);
+	bool bindModel(ObjModel*);
+	bool loadColor(QString);
+	bool setColorMode(ColorFileLoader::COLOR_MODE);
 
 	void initializeGL() override;
 	void paintGL() override;
