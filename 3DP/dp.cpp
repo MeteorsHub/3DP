@@ -46,7 +46,7 @@ void DP::on_clicked_actionColor()
 		this->ui.mainglwidget->setColorMode(dialog.getColorMode());
 		if (!this->ui.mainglwidget->loadColor(dialog.getColorFileName())) {
 			QString msg = "File ";
-			msg += dialog.getColorFileName() + " cannot open";
+			msg += dialog.getColorFileName() + " cannot be loaded";
 			QMessageBox::warning(this, "Color loading failed", msg);
 		}
 		this->ui.mainglwidget->updateGL();
