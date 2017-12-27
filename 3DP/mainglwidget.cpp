@@ -9,12 +9,13 @@ using namespace std;
 MainGLWidget::MainGLWidget(QWidget *parent)
 	:QGLWidget(parent)
 {
-	obj_model = nullptr;
+	obj_model = new ObjModel();
 	toggleWired = false;
 	toggleAxis = true;
 
 	leftBtnClk = false;
 	leftBtnLastPos = QPoint(0, 0);
+	lines = vector<line>(0);
 
 	cameraAngle = 40.0;
 	cameraRadius = 4.0;
@@ -25,16 +26,19 @@ MainGLWidget::MainGLWidget(QWidget *parent)
 bool MainGLWidget::bindModel(ObjModel *model)
 {
 	obj_model = model;
+	lines = vector<line>(0);
 	return true;
 }
 
 bool MainGLWidget::loadColor(QString filename)
 {
+	lines = vector<line>(0);
 	return this->obj_model->loadColorFile(filename);
 }
 
 bool MainGLWidget::setColorMode(ColorFileLoader::COLOR_MODE mode)
 {
+	lines = vector<line>(0);
 	return this->obj_model->setColorMode(mode);
 }
 
@@ -85,6 +89,58 @@ void MainGLWidget::paintGL()
 			glVertex3d(obj_model->faces3->at(i).v3.x, obj_model->faces3->at(i).v3.y, obj_model->faces3->at(i).v3.z);
 			glEnd();
 		}
+		// vertice selections
+		if (obj_model->verticesColor1->size() != 0) {
+			glColor3f(0.9, 0.1, 0.1);
+			for (int i = 0; i < obj_model->verticesColor1->size(); i++) {
+				glPushMatrix();
+				vertice point = obj_model->verticesColor1->at(i);
+				glTranslatef(point.x, point.y, point.z);
+				glutSolidSphere(0.005, 20, 20);
+				glPopMatrix();
+			}
+		}
+		if (obj_model->verticesColor2->size() != 0) {
+			glColor3f(0.1, 0.1, 0.9);
+			for (int i = 0; i < obj_model->verticesColor2->size(); i++) {
+				glPushMatrix();
+				vertice point = obj_model->verticesColor2->at(i);
+				glTranslatef(point.x, point.y, point.z);
+				glutSolidSphere(0.002, 20, 20);
+				glPopMatrix();
+			}
+		}
+		// face selections
+		if (obj_model->faces3Color1->size() != 0) {
+			glColor3f(0.1, 0.1, 0.9);
+			for (int i = 0; i < obj_model->faces3Color1->size(); i++) {
+				face3 face = obj_model->faces3Color1->at(i);
+				glBegin(GL_TRIANGLES);
+				glVertex3d(face.v1.x, face.v1.y, face.v1.z);
+				glVertex3d(face.v2.x, face.v2.y, face.v2.z);
+				glVertex3d(face.v3.x, face.v3.y, face.v3.z);
+				glEnd();
+			}
+		}
+		if (obj_model->faces3Color2->size() != 0) {
+			glColor3f(0.1, 0.9, 0.5);
+			for (int i = 0; i < obj_model->faces3Color2->size(); i++) {
+				face3 face = obj_model->faces3Color2->at(i);
+				glBegin(GL_TRIANGLES);
+				glVertex3d(face.v1.x, face.v1.y, face.v1.z);
+				glVertex3d(face.v2.x, face.v2.y, face.v2.z);
+				glVertex3d(face.v3.x, face.v3.y, face.v3.z);
+				glEnd();
+			}
+		}
+		// line drawing
+		for (int i = 0; i < lines.size(); i++) {
+			glColor3f(0.95, 0.2, 0.3);
+			glBegin(GL_LINES);
+			glVertex3f(lines.at(i).v1.x, lines.at(i).v1.y, lines.at(i).v1.z);
+			glVertex3f(lines.at(i).v2.x, lines.at(i).v2.y, lines.at(i).v2.z);
+			glEnd();
+		}
 		if (!toggleWired) {
 			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
 				if (obj_model->getNumColor() != 0) {
@@ -111,6 +167,35 @@ void MainGLWidget::resizeGL(int w, int h)
 	gluPerspective(cameraAngle, float(w) / float(h), 0.01, 100.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	updateGL();
+}
+
+void MainGLWidget::neighborPoP(int pId)
+{
+	lines = vector<line>(0);
+	obj_model->neighborPoP(pId);
+	updateGL();
+}
+
+void MainGLWidget::neighborFoP(int pId)
+{
+	lines = vector<line>(0);
+	obj_model->neighborFoP(pId);
+	updateGL();
+}
+
+void MainGLWidget::neighborFoF(int fId)
+{
+	lines = vector<line>(0);
+	obj_model->neighborFoF(fId);
+	updateGL();
+}
+
+void MainGLWidget::drawNormalLineFromFace(int fId)
+{
+	lines = vector<line>(0);
+	line norm = obj_model->getNormalLineFromFace(fId);
+	lines.push_back(norm);
 	updateGL();
 }
 

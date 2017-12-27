@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include "colorfileloader.h"
+#include "inputdialog.h"
 
 DP::DP(QWidget *parent)
 	: QMainWindow(parent)
@@ -41,7 +42,7 @@ void DP::on_clicked_actionOpen() {
 
 void DP::on_clicked_actionColor() 
 {
-	ColorFileLoader dialog;
+	ColorFileLoader dialog(this);
 	if (dialog.exec() == QDialog::Accepted) {
 		this->ui.mainglwidget->setColorMode(dialog.getColorMode());
 		if (!this->ui.mainglwidget->loadColor(dialog.getColorFileName())) {
@@ -50,6 +51,86 @@ void DP::on_clicked_actionColor()
 			QMessageBox::warning(this, "Color loading failed", msg);
 		}
 		this->ui.mainglwidget->updateGL();
+	}
+}
+
+void DP::on_clicked_actionNeighborPoP()
+{
+	QString title = "Neighbor Points of a Point";
+	InputDialog dialog(this, title);
+	int pointNum = this->ui.mainglwidget->obj_model->getNumVertices();
+	QString info = "Input the point id (1 ~ ";
+	info += QString::number(pointNum);
+	info += ")";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		int pointId = inputText.toInt();
+		if (pointId < 1 || pointId > pointNum) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input an integer between 1 and " + pointNum);
+			return;
+		}
+		this->ui.mainglwidget->neighborPoP(pointId - 1);
+	}
+}
+
+void DP::on_clicked_actionNeighborFoP()
+{
+	QString title = "Neighbor Faces of a Point";
+	InputDialog dialog(this, title);
+	int pointNum = this->ui.mainglwidget->obj_model->getNumVertices();
+	QString info = "Input the point id (1 ~ ";
+	info += QString::number(pointNum);
+	info += ")";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		int pointId = inputText.toInt();
+		if (pointId < 1 || pointId > pointNum) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input an integer between 1 and " + pointNum);
+			return;
+		}
+		this->ui.mainglwidget->neighborFoP(pointId - 1);
+	}
+}
+
+void DP::on_clicked_actionNeighborFoF()
+{
+	QString title = "Neighbor Faces of a Face";
+	InputDialog dialog(this, title);
+	int faceNum = this->ui.mainglwidget->obj_model->getNumFaces3();
+	QString info = "Input the face id (1 ~ ";
+	info += QString::number(faceNum);
+	info += ")";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		int faceId = inputText.toInt();
+		if (faceId < 1 || faceId > faceNum) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input an integer between 1 and " + faceNum);
+			return;
+		}
+		this->ui.mainglwidget->neighborFoF(faceId - 1);
+	}
+}
+
+void DP::on_clicked_actionNormalFromFace()
+{
+	QString title = "Nromal line of a Face";
+	InputDialog dialog(this, title);
+	int faceNum = this->ui.mainglwidget->obj_model->getNumFaces3();
+	QString info = "Input the face id (1 ~ ";
+	info += QString::number(faceNum);
+	info += ")";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		int faceId = inputText.toInt();
+		if (faceId < 1 || faceId > faceNum) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input an integer between 1 and " + faceNum);
+			return;
+		}
+		this->ui.mainglwidget->drawNormalLineFromFace(faceId);
 	}
 }
 

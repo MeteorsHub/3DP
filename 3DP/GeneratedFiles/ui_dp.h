@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dp.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.2
+** Created by: Qt User Interface Compiler version 5.9.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -35,6 +35,11 @@ public:
     QAction *actionOpen;
     QAction *actionQuit;
     QAction *actionColor;
+    QAction *actionNeighbor_Point_of_Point;
+    QAction *actionNeighbor_Face_of_Point;
+    QAction *actionNeighbor_Face_of_Face;
+    QAction *actionFace;
+    QAction *actionDenoising;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     MainGLWidget *mainglwidget;
@@ -47,6 +52,10 @@ public:
     QMenuBar *menuBar;
     QMenu *menu;
     QMenu *menuEdit;
+    QMenu *menuSelection;
+    QMenu *menuDraw;
+    QMenu *menuNormal_Vector;
+    QMenu *menuFunctions;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -67,6 +76,16 @@ public:
         actionQuit->setIcon(icon1);
         actionColor = new QAction(DPClass);
         actionColor->setObjectName(QStringLiteral("actionColor"));
+        actionNeighbor_Point_of_Point = new QAction(DPClass);
+        actionNeighbor_Point_of_Point->setObjectName(QStringLiteral("actionNeighbor_Point_of_Point"));
+        actionNeighbor_Face_of_Point = new QAction(DPClass);
+        actionNeighbor_Face_of_Point->setObjectName(QStringLiteral("actionNeighbor_Face_of_Point"));
+        actionNeighbor_Face_of_Face = new QAction(DPClass);
+        actionNeighbor_Face_of_Face->setObjectName(QStringLiteral("actionNeighbor_Face_of_Face"));
+        actionFace = new QAction(DPClass);
+        actionFace->setObjectName(QStringLiteral("actionFace"));
+        actionDenoising = new QAction(DPClass);
+        actionDenoising->setObjectName(QStringLiteral("actionDenoising"));
         centralWidget = new QWidget(DPClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -124,6 +143,14 @@ public:
         menu->setObjectName(QStringLiteral("menu"));
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menuSelection = new QMenu(menuEdit);
+        menuSelection->setObjectName(QStringLiteral("menuSelection"));
+        menuDraw = new QMenu(menuBar);
+        menuDraw->setObjectName(QStringLiteral("menuDraw"));
+        menuNormal_Vector = new QMenu(menuDraw);
+        menuNormal_Vector->setObjectName(QStringLiteral("menuNormal_Vector"));
+        menuFunctions = new QMenu(menuBar);
+        menuFunctions->setObjectName(QStringLiteral("menuFunctions"));
         DPClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(DPClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -134,9 +161,18 @@ public:
 
         menuBar->addAction(menu->menuAction());
         menuBar->addAction(menuEdit->menuAction());
+        menuBar->addAction(menuDraw->menuAction());
+        menuBar->addAction(menuFunctions->menuAction());
         menu->addAction(actionOpen);
         menu->addAction(actionQuit);
         menuEdit->addAction(actionColor);
+        menuEdit->addAction(menuSelection->menuAction());
+        menuSelection->addAction(actionNeighbor_Point_of_Point);
+        menuSelection->addAction(actionNeighbor_Face_of_Point);
+        menuSelection->addAction(actionNeighbor_Face_of_Face);
+        menuDraw->addAction(menuNormal_Vector->menuAction());
+        menuNormal_Vector->addAction(actionFace);
+        menuFunctions->addAction(actionDenoising);
         mainToolBar->addAction(actionOpen);
         mainToolBar->addAction(actionQuit);
 
@@ -147,6 +183,10 @@ public:
         QObject::connect(checkBox_2, SIGNAL(clicked(bool)), DPClass, SLOT(on_checked_axisCheckBox(bool)));
         QObject::connect(checkBox, SIGNAL(clicked(bool)), DPClass, SLOT(on_checked_wiredCheckBox(bool)));
         QObject::connect(actionColor, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionColor()));
+        QObject::connect(actionNeighbor_Point_of_Point, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborPoP()));
+        QObject::connect(actionNeighbor_Face_of_Point, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborFoP()));
+        QObject::connect(actionNeighbor_Face_of_Face, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborFoF()));
+        QObject::connect(actionFace, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNormalFromFace()));
 
         QMetaObject::connectSlotsByName(DPClass);
     } // setupUi
@@ -157,12 +197,21 @@ public:
         actionOpen->setText(QApplication::translate("DPClass", "Open", Q_NULLPTR));
         actionQuit->setText(QApplication::translate("DPClass", "Quit", Q_NULLPTR));
         actionColor->setText(QApplication::translate("DPClass", "Color", Q_NULLPTR));
+        actionNeighbor_Point_of_Point->setText(QApplication::translate("DPClass", "Neighbor Points of a Point", Q_NULLPTR));
+        actionNeighbor_Face_of_Point->setText(QApplication::translate("DPClass", "Neighbor Faces of a Point", Q_NULLPTR));
+        actionNeighbor_Face_of_Face->setText(QApplication::translate("DPClass", "Neighbor Faces of a Face", Q_NULLPTR));
+        actionFace->setText(QApplication::translate("DPClass", "From Face", Q_NULLPTR));
+        actionDenoising->setText(QApplication::translate("DPClass", "Denoising", Q_NULLPTR));
         label->setText(QApplication::translate("DPClass", "Axis", Q_NULLPTR));
         checkBox_2->setText(QApplication::translate("DPClass", "Display", Q_NULLPTR));
         label_2->setText(QApplication::translate("DPClass", "Wire", Q_NULLPTR));
         checkBox->setText(QApplication::translate("DPClass", "Wired", Q_NULLPTR));
         menu->setTitle(QApplication::translate("DPClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("DPClass", "Edit", Q_NULLPTR));
+        menuSelection->setTitle(QApplication::translate("DPClass", "Selection", Q_NULLPTR));
+        menuDraw->setTitle(QApplication::translate("DPClass", "Draw", Q_NULLPTR));
+        menuNormal_Vector->setTitle(QApplication::translate("DPClass", "Normal Vector", Q_NULLPTR));
+        menuFunctions->setTitle(QApplication::translate("DPClass", "Functions", Q_NULLPTR));
     } // retranslateUi
 
 };

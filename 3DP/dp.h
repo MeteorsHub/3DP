@@ -18,6 +18,11 @@ private:
 public slots:
 	void on_clicked_actionOpen();
 	void on_clicked_actionColor();
+	void on_clicked_actionNeighborPoP();
+	void on_clicked_actionNeighborFoP();
+	void on_clicked_actionNeighborFoF();
+	void on_clicked_actionNormalFromFace();
+
 
 	void on_checked_wiredCheckBox(bool);
 	void on_checked_axisCheckBox(bool);

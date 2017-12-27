@@ -38,10 +38,10 @@ public:
         InputDialog->setMaximumSize(QSize(325, 229));
         infoLabel = new QLabel(InputDialog);
         infoLabel->setObjectName(QStringLiteral("infoLabel"));
-        infoLabel->setGeometry(QRect(50, 50, 54, 12));
+        infoLabel->setGeometry(QRect(30, 50, 271, 16));
         lineEdit = new QLineEdit(InputDialog);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
-        lineEdit->setGeometry(QRect(50, 80, 201, 20));
+        lineEdit->setGeometry(QRect(30, 80, 271, 20));
         pushButton = new QPushButton(InputDialog);
         pushButton->setObjectName(QStringLiteral("pushButton"));
         pushButton->setGeometry(QRect(130, 150, 75, 23));
@@ -59,7 +59,7 @@ public:
     void retranslateUi(QDialog *InputDialog)
     {
         InputDialog->setWindowTitle(QApplication::translate("InputDialog", "InputDialog", Q_NULLPTR));
-        infoLabel->setText(QApplication::translate("InputDialog", "Info", Q_NULLPTR));
+        infoLabel->setText(QApplication::translate("InputDialog", "Input", Q_NULLPTR));
         pushButton->setText(QApplication::translate("InputDialog", "Ok", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("InputDialog", "Cancel", Q_NULLPTR));
     } // retranslateUi

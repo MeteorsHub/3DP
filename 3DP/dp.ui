@@ -101,10 +101,39 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <widget class="QMenu" name="menuSelection">
+     <property name="title">
+      <string>Selection</string>
+     </property>
+     <addaction name="actionNeighbor_Point_of_Point"/>
+     <addaction name="actionNeighbor_Face_of_Point"/>
+     <addaction name="actionNeighbor_Face_of_Face"/>
+    </widget>
     <addaction name="actionColor"/>
+    <addaction name="menuSelection"/>
+   </widget>
+   <widget class="QMenu" name="menuDraw">
+    <property name="title">
+     <string>Draw</string>
+    </property>
+    <widget class="QMenu" name="menuNormal_Vector">
+     <property name="title">
+      <string>Normal Vector</string>
+     </property>
+     <addaction name="actionFace"/>
+    </widget>
+    <addaction name="menuNormal_Vector"/>
+   </widget>
+   <widget class="QMenu" name="menuFunctions">
+    <property name="title">
+     <string>Functions</string>
+    </property>
+    <addaction name="actionDenoising"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuDraw"/>
+   <addaction name="menuFunctions"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -138,6 +167,31 @@
   <action name="actionColor">
    <property name="text">
     <string>Color</string>
+   </property>
+  </action>
+  <action name="actionNeighbor_Point_of_Point">
+   <property name="text">
+    <string>Neighbor Points of a Point</string>
+   </property>
+  </action>
+  <action name="actionNeighbor_Face_of_Point">
+   <property name="text">
+    <string>Neighbor Faces of a Point</string>
+   </property>
+  </action>
+  <action name="actionNeighbor_Face_of_Face">
+   <property name="text">
+    <string>Neighbor Faces of a Face</string>
+   </property>
+  </action>
+  <action name="actionFace">
+   <property name="text">
+    <string>From Face</string>
+   </property>
+  </action>
+  <action name="actionDenoising">
+   <property name="text">
+    <string>Denoising</string>
    </property>
   </action>
  </widget>
@@ -250,11 +304,79 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionNeighbor_Point_of_Point</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionNeighborPoP()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNeighbor_Face_of_Point</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionNeighborFoP()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNeighbor_Face_of_Face</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionNeighborFoF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFace</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionNormalFromFace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_clicked_actionOpen()</slot>
   <slot>on_checked_wiredCheckBox(bool)</slot>
   <slot>on_checked_axisCheckBox(bool)</slot>
   <slot>on_clicked_actionColor()</slot>
+  <slot>on_clicked_actionNeighborPoP()</slot>
+  <slot>on_clicked_actionNeighborFoP()</slot>
+  <slot>on_clicked_actionNeighborFoF()</slot>
+  <slot>on_clicked_actionNormalFromFace()</slot>
  </slots>
 </ui>

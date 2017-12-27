@@ -19,6 +19,11 @@ public:
 	void paintGL() override;
 	void resizeGL(int, int) override;
 
+	void neighborPoP(int pId);
+	void neighborFoP(int pId);
+	void neighborFoF(int fId);
+	void drawNormalLineFromFace(int fId);
+
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseReleaseEvent(QMouseEvent*) override;
 	void mouseMoveEvent(QMouseEvent*) override;
@@ -40,4 +45,5 @@ private:
 	GLfloat cameraRadius;
 	GLfloat theta;
 	GLfloat phi;
+	vector<line> lines;
 };
