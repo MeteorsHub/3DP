@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'inputdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.3
+** Created by: Qt User Interface Compiler version 5.9.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -38,7 +38,7 @@ public:
         InputDialog->setMaximumSize(QSize(325, 229));
         infoLabel = new QLabel(InputDialog);
         infoLabel->setObjectName(QStringLiteral("infoLabel"));
-        infoLabel->setGeometry(QRect(30, 50, 271, 16));
+        infoLabel->setGeometry(QRect(30, 30, 271, 41));
         lineEdit = new QLineEdit(InputDialog);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
         lineEdit->setGeometry(QRect(30, 80, 271, 20));

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>767</width>
-    <height>543</height>
+    <width>941</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -86,7 +86,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>767</width>
+     <width>941</width>
      <height>23</height>
     </rect>
    </property>
@@ -108,6 +108,8 @@
      <addaction name="actionNeighbor_Point_of_Point"/>
      <addaction name="actionNeighbor_Face_of_Point"/>
      <addaction name="actionNeighbor_Face_of_Face"/>
+     <addaction name="separator"/>
+     <addaction name="actionRegionFromPoints"/>
     </widget>
     <addaction name="actionColor"/>
     <addaction name="menuSelection"/>
@@ -192,6 +194,11 @@
   <action name="actionDenoising">
    <property name="text">
     <string>Denoising</string>
+   </property>
+  </action>
+  <action name="actionRegionFromPoints">
+   <property name="text">
+    <string>Region from Points</string>
    </property>
   </action>
  </widget>
@@ -368,6 +375,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionRegionFromPoints</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionRegionFromPoints()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_clicked_actionOpen()</slot>
@@ -378,5 +401,6 @@
   <slot>on_clicked_actionNeighborFoP()</slot>
   <slot>on_clicked_actionNeighborFoF()</slot>
   <slot>on_clicked_actionNormalFromFace()</slot>
+  <slot>on_clicked_actionRegionFromPoints()</slot>
  </slots>
 </ui>

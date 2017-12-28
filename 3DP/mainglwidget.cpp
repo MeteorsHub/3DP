@@ -191,6 +191,10 @@ void MainGLWidget::neighborFoF(int fId)
 	updateGL();
 }
 
+void MainGLWidget::regionFromPoints(vector<int> pIds, bool strict)
+{
+}
+
 void MainGLWidget::drawNormalLineFromFace(int fId)
 {
 	lines = vector<line>(0);

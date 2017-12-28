@@ -21,6 +21,7 @@ public slots:
 	void on_clicked_actionNeighborPoP();
 	void on_clicked_actionNeighborFoP();
 	void on_clicked_actionNeighborFoF();
+	void on_clicked_actionRegionFromPoints();
 	void on_clicked_actionNormalFromFace();
 
 

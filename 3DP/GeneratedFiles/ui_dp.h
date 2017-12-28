@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dp.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.3
+** Created by: Qt User Interface Compiler version 5.9.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -40,6 +40,7 @@ public:
     QAction *actionNeighbor_Face_of_Face;
     QAction *actionFace;
     QAction *actionDenoising;
+    QAction *actionRegionFromPoints;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     MainGLWidget *mainglwidget;
@@ -63,7 +64,7 @@ public:
     {
         if (DPClass->objectName().isEmpty())
             DPClass->setObjectName(QStringLiteral("DPClass"));
-        DPClass->resize(767, 543);
+        DPClass->resize(941, 612);
         actionOpen = new QAction(DPClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         QIcon icon;
@@ -86,6 +87,8 @@ public:
         actionFace->setObjectName(QStringLiteral("actionFace"));
         actionDenoising = new QAction(DPClass);
         actionDenoising->setObjectName(QStringLiteral("actionDenoising"));
+        actionRegionFromPoints = new QAction(DPClass);
+        actionRegionFromPoints->setObjectName(QStringLiteral("actionRegionFromPoints"));
         centralWidget = new QWidget(DPClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -138,7 +141,7 @@ public:
         DPClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DPClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 767, 23));
+        menuBar->setGeometry(QRect(0, 0, 941, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QStringLiteral("menu"));
         menuEdit = new QMenu(menuBar);
@@ -170,6 +173,8 @@ public:
         menuSelection->addAction(actionNeighbor_Point_of_Point);
         menuSelection->addAction(actionNeighbor_Face_of_Point);
         menuSelection->addAction(actionNeighbor_Face_of_Face);
+        menuSelection->addSeparator();
+        menuSelection->addAction(actionRegionFromPoints);
         menuDraw->addAction(menuNormal_Vector->menuAction());
         menuNormal_Vector->addAction(actionFace);
         menuFunctions->addAction(actionDenoising);
@@ -187,6 +192,7 @@ public:
         QObject::connect(actionNeighbor_Face_of_Point, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborFoP()));
         QObject::connect(actionNeighbor_Face_of_Face, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborFoF()));
         QObject::connect(actionFace, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNormalFromFace()));
+        QObject::connect(actionRegionFromPoints, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionRegionFromPoints()));
 
         QMetaObject::connectSlotsByName(DPClass);
     } // setupUi
@@ -202,6 +208,7 @@ public:
         actionNeighbor_Face_of_Face->setText(QApplication::translate("DPClass", "Neighbor Faces of a Face", Q_NULLPTR));
         actionFace->setText(QApplication::translate("DPClass", "From Face", Q_NULLPTR));
         actionDenoising->setText(QApplication::translate("DPClass", "Denoising", Q_NULLPTR));
+        actionRegionFromPoints->setText(QApplication::translate("DPClass", "Region from Points", Q_NULLPTR));
         label->setText(QApplication::translate("DPClass", "Axis", Q_NULLPTR));
         checkBox_2->setText(QApplication::translate("DPClass", "Display", Q_NULLPTR));
         label_2->setText(QApplication::translate("DPClass", "Wire", Q_NULLPTR));

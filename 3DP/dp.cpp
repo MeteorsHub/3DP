@@ -114,6 +114,32 @@ void DP::on_clicked_actionNeighborFoF()
 	}
 }
 
+void DP::on_clicked_actionRegionFromPoints()
+{
+	QString title = "Region of Multi-Points";
+	InputDialog dialog(this, title);
+	int pointNum = this->ui.mainglwidget->obj_model->getNumVertices();
+	QString info = "Input the points ids (each 1 ~ ";
+	info += QString::number(pointNum);
+	info += ")\nEach seperated by blank space. (i.e: 1 3 14 15)";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		QStringList inputTextList = inputText.split(" ");
+		vector<int> pointIds(0);
+		for (int i = 0; i < inputTextList.size(); i++) {
+			int pointId = inputTextList.at(i).toInt();
+			if (pointId < 1 || pointId > pointNum) {
+				QMessageBox::warning(this, "Input Invalid Format", "Please input any integers between 1 and " + pointNum);
+				return;
+			}
+			pointIds.push_back(pointId);
+		}
+		
+		this->ui.mainglwidget->neighborFoP(pointId - 1);
+	}
+}
+
 void DP::on_clicked_actionNormalFromFace()
 {
 	QString title = "Nromal line of a Face";
@@ -130,7 +156,7 @@ void DP::on_clicked_actionNormalFromFace()
 			QMessageBox::warning(this, "Input Invalid Format", "Please input an integer between 1 and " + faceNum);
 			return;
 		}
-		this->ui.mainglwidget->drawNormalLineFromFace(faceId);
+		this->ui.mainglwidget->drawNormalLineFromFace(faceId - 1);
 	}
 }
 

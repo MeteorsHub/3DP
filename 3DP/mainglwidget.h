@@ -22,6 +22,7 @@ public:
 	void neighborPoP(int pId);
 	void neighborFoP(int pId);
 	void neighborFoF(int fId);
+	void regionFromPoints(vector<int> pIds, bool strict);
 	void drawNormalLineFromFace(int fId);
 
 	void mousePressEvent(QMouseEvent*) override;
