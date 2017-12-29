@@ -4,7 +4,9 @@
 
 This program provides a tool to view 3D object (.obj or .off) together with its color, select some useful neighboring vertices or faces and operate the model like Gaussion filtering.
 
-You can get the latest release from []().
+You can get the latest release from [https://github.com/MeteorKepler/3DP/releases]().
+
+![3DP](https://github.com/MeteorKepler/3DP/raw/master/doc/image/3DP.png)
 
 ## Functions in detailed
 
