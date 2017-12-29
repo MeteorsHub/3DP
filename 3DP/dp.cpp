@@ -7,6 +7,7 @@
 #include <QDebug>
 #include "colorfileloader.h"
 #include "inputdialog.h"
+#include "yesornotdialog.h"
 
 DP::DP(QWidget *parent)
 	: QMainWindow(parent)
@@ -117,17 +118,28 @@ void DP::on_clicked_actionNeighborFoF()
 void DP::on_clicked_actionRegionFromPoints()
 {
 	QString title = "Region of Multi-Points";
-	InputDialog dialog(this, title);
+	InputDialog dialog1(this, title);
 	int pointNum = this->ui.mainglwidget->obj_model->getNumVertices();
 	QString info = "Input the points ids (each 1 ~ ";
 	info += QString::number(pointNum);
-	info += ")\nEach seperated by blank space. (i.e: 1 3 14 15)";
-	dialog.setInfoText(info);
-	if (dialog.exec() == QDialog::Accepted) {
-		QString inputText = dialog.getInputText();
+	info += ")\nEach seperated by blank space.\ni.e: 1 3 14 15";
+	dialog1.setInfoText(info);
+
+	title = "Whether to Use Strict Mode";
+	YesOrNotDialog dialog2(this, title);
+	info = "Whether to use strict egion selection mode?\n";
+	info += "If 'Yes', only faces whose all three points\n\tare selected will be selected\n";
+	info += "If 'No', faces which have two points selected\n\tat leastwill all be selected";
+	dialog2.setInstruction(info);
+
+	vector<int> pointIds(0);
+	if (dialog1.exec() == QDialog::Accepted) {
+		QString inputText = dialog1.getInputText();
 		QStringList inputTextList = inputText.split(" ");
-		vector<int> pointIds(0);
+		inputTextList.removeDuplicates();
 		for (int i = 0; i < inputTextList.size(); i++) {
+			if (inputTextList.at(i).isEmpty())
+				continue;
 			int pointId = inputTextList.at(i).toInt();
 			if (pointId < 1 || pointId > pointNum) {
 				QMessageBox::warning(this, "Input Invalid Format", "Please input any integers between 1 and " + pointNum);
@@ -136,7 +148,10 @@ void DP::on_clicked_actionRegionFromPoints()
 			pointIds.push_back(pointId);
 		}
 		
-		this->ui.mainglwidget->neighborFoP(pointId - 1);
+		if (dialog2.exec() == QDialog::Accepted) {
+			bool strict = dialog2.getYesState();
+			this->ui.mainglwidget->regionFromPoints(pointIds, strict);
+		}
 	}
 }
 
@@ -160,6 +175,42 @@ void DP::on_clicked_actionNormalFromFace()
 	}
 }
 
+void DP::on_clicked_actionAddNoise()
+{
+	QString title = "Add noise";
+	InputDialog dialog(this, title);
+	QString info = "Input the deviation (ie. 0.05)";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		double deviation = inputText.toDouble();
+		if (deviation <= 0.0) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input a double greater than 0");
+			return;
+		}
+		this->ui.mainglwidget->addNoise(deviation);
+	}
+}
+
+void DP::on_clicked_actionDenoising()
+{
+	this->ui.mainglwidget->deNoise();
+}
+
+void DP::on_clicked_actionMSE()
+{
+	double mse = this->ui.mainglwidget->computeMSE();
+	QString info = "Mean Square Error (MSE) is ";
+	info += QString::number(mse);
+	info += ".";
+	QMessageBox::information(this, "MSE", info);
+}
+
+void DP::on_clicked_actionClear()
+{
+	this->ui.mainglwidget->clearNoise();
+}
+
 void DP::on_checked_wiredCheckBox(bool wired)
 {
 	this->ui.mainglwidget->toggleWired = wired;
@@ -169,5 +220,29 @@ void DP::on_checked_wiredCheckBox(bool wired)
 void DP::on_checked_axisCheckBox(bool axis)
 {
 	this->ui.mainglwidget->toggleAxis = axis;
+	this->ui.mainglwidget->updateGL();
+}
+
+void DP::on_checked_original(bool flag)
+{
+	this->ui.mainglwidget->original = flag;
+	this->ui.mainglwidget->updateGL();
+}
+
+void DP::on_checked_noiseObj(bool flag)
+{
+	this->ui.mainglwidget->noiseObj = flag;
+	this->ui.mainglwidget->updateGL();
+}
+
+void DP::on_checked_denoiseObj(bool flag)
+{
+	this->ui.mainglwidget->denoiseObj = flag;
+	this->ui.mainglwidget->updateGL();
+}
+
+void DP::on_checked_mse(bool flag)
+{
+	this->ui.mainglwidget->mse = flag;
 	this->ui.mainglwidget->updateGL();
 }

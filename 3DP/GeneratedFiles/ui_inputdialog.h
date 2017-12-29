@@ -38,7 +38,7 @@ public:
         InputDialog->setMaximumSize(QSize(325, 229));
         infoLabel = new QLabel(InputDialog);
         infoLabel->setObjectName(QStringLiteral("infoLabel"));
-        infoLabel->setGeometry(QRect(30, 30, 271, 41));
+        infoLabel->setGeometry(QRect(10, 30, 311, 41));
         lineEdit = new QLineEdit(InputDialog);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
         lineEdit->setGeometry(QRect(30, 80, 271, 20));

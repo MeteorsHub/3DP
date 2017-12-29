@@ -15,22 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <widget class="MainGLWidget" name="mainglwidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="mouseTracking">
-       <bool>false</bool>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::StrongFocus</enum>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -77,7 +61,76 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_6">
+        <property name="text">
+         <string>Original</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_3">
+        <property name="text">
+         <string>noise obj</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_4">
+        <property name="text">
+         <string>denoise obj</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_5">
+        <property name="text">
+         <string>MSE</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
+    </item>
+    <item row="0" column="1">
+     <widget class="MainGLWidget" name="mainglwidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -130,7 +183,10 @@
     <property name="title">
      <string>Functions</string>
     </property>
+    <addaction name="actionAdd_Noise"/>
     <addaction name="actionDenoising"/>
+    <addaction name="actionMSE"/>
+    <addaction name="actionClear"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
@@ -199,6 +255,21 @@
   <action name="actionRegionFromPoints">
    <property name="text">
     <string>Region from Points</string>
+   </property>
+  </action>
+  <action name="actionAdd_Noise">
+   <property name="text">
+    <string>Add Noise</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionMSE">
+   <property name="text">
+    <string>MSE</string>
    </property>
   </action>
  </widget>
@@ -391,6 +462,134 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAdd_Noise</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionAddNoise()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDenoising</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionDenoising()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClear</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionClear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_3</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_checked_noiseObj(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_checked_denoiseObj(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>24</x>
+     <y>373</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_checked_mse(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>61</x>
+     <y>396</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_6</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_checked_original(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>327</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>67</x>
+     <y>280</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionMSE</sender>
+   <signal>triggered()</signal>
+   <receiver>DPClass</receiver>
+   <slot>on_clicked_actionMSE()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_clicked_actionOpen()</slot>
@@ -402,5 +601,13 @@
   <slot>on_clicked_actionNeighborFoF()</slot>
   <slot>on_clicked_actionNormalFromFace()</slot>
   <slot>on_clicked_actionRegionFromPoints()</slot>
+  <slot>on_clicked_actionAddNoise()</slot>
+  <slot>on_clicked_actionDenoising()</slot>
+  <slot>on_clicked_actionClear()</slot>
+  <slot>on_checked_noiseObj(bool)</slot>
+  <slot>on_checked_denoiseObj(bool)</slot>
+  <slot>on_checked_mse(bool)</slot>
+  <slot>on_checked_original(bool)</slot>
+  <slot>on_clicked_actionMSE()</slot>
  </slots>
 </ui>

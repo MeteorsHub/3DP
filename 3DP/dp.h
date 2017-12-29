@@ -23,9 +23,15 @@ public slots:
 	void on_clicked_actionNeighborFoF();
 	void on_clicked_actionRegionFromPoints();
 	void on_clicked_actionNormalFromFace();
-
+	void on_clicked_actionAddNoise();
+	void on_clicked_actionDenoising();
+	void on_clicked_actionMSE();
+	void on_clicked_actionClear();
 
 	void on_checked_wiredCheckBox(bool);
 	void on_checked_axisCheckBox(bool);
-
+	void on_checked_original(bool);
+	void on_checked_noiseObj(bool);
+	void on_checked_denoiseObj(bool);
+	void on_checked_mse(bool);
 };

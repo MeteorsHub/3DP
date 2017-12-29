@@ -41,15 +41,23 @@ public:
     QAction *actionFace;
     QAction *actionDenoising;
     QAction *actionRegionFromPoints;
+    QAction *actionAdd_Noise;
+    QAction *actionClear;
+    QAction *actionMSE;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
-    MainGLWidget *mainglwidget;
     QVBoxLayout *verticalLayout;
     QLabel *label;
     QCheckBox *checkBox_2;
     QLabel *label_2;
     QCheckBox *checkBox;
     QSpacerItem *verticalSpacer;
+    QCheckBox *checkBox_6;
+    QCheckBox *checkBox_3;
+    QCheckBox *checkBox_4;
+    QCheckBox *checkBox_5;
+    QSpacerItem *verticalSpacer_2;
+    MainGLWidget *mainglwidget;
     QMenuBar *menuBar;
     QMenu *menu;
     QMenu *menuEdit;
@@ -89,24 +97,18 @@ public:
         actionDenoising->setObjectName(QStringLiteral("actionDenoising"));
         actionRegionFromPoints = new QAction(DPClass);
         actionRegionFromPoints->setObjectName(QStringLiteral("actionRegionFromPoints"));
+        actionAdd_Noise = new QAction(DPClass);
+        actionAdd_Noise->setObjectName(QStringLiteral("actionAdd_Noise"));
+        actionClear = new QAction(DPClass);
+        actionClear->setObjectName(QStringLiteral("actionClear"));
+        actionMSE = new QAction(DPClass);
+        actionMSE->setObjectName(QStringLiteral("actionMSE"));
         centralWidget = new QWidget(DPClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        mainglwidget = new MainGLWidget(centralWidget);
-        mainglwidget->setObjectName(QStringLiteral("mainglwidget"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(mainglwidget->sizePolicy().hasHeightForWidth());
-        mainglwidget->setSizePolicy(sizePolicy);
-        mainglwidget->setMouseTracking(false);
-        mainglwidget->setFocusPolicy(Qt::StrongFocus);
-
-        gridLayout->addWidget(mainglwidget, 0, 1, 1, 1);
-
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -135,8 +137,48 @@ public:
 
         verticalLayout->addItem(verticalSpacer);
 
+        checkBox_6 = new QCheckBox(centralWidget);
+        checkBox_6->setObjectName(QStringLiteral("checkBox_6"));
+        checkBox_6->setChecked(true);
+
+        verticalLayout->addWidget(checkBox_6);
+
+        checkBox_3 = new QCheckBox(centralWidget);
+        checkBox_3->setObjectName(QStringLiteral("checkBox_3"));
+        checkBox_3->setChecked(true);
+
+        verticalLayout->addWidget(checkBox_3);
+
+        checkBox_4 = new QCheckBox(centralWidget);
+        checkBox_4->setObjectName(QStringLiteral("checkBox_4"));
+        checkBox_4->setChecked(true);
+
+        verticalLayout->addWidget(checkBox_4);
+
+        checkBox_5 = new QCheckBox(centralWidget);
+        checkBox_5->setObjectName(QStringLiteral("checkBox_5"));
+        checkBox_5->setChecked(true);
+
+        verticalLayout->addWidget(checkBox_5);
+
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
+
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
+
+        mainglwidget = new MainGLWidget(centralWidget);
+        mainglwidget->setObjectName(QStringLiteral("mainglwidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(mainglwidget->sizePolicy().hasHeightForWidth());
+        mainglwidget->setSizePolicy(sizePolicy);
+        mainglwidget->setMouseTracking(false);
+        mainglwidget->setFocusPolicy(Qt::StrongFocus);
+
+        gridLayout->addWidget(mainglwidget, 0, 1, 1, 1);
 
         DPClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DPClass);
@@ -177,7 +219,10 @@ public:
         menuSelection->addAction(actionRegionFromPoints);
         menuDraw->addAction(menuNormal_Vector->menuAction());
         menuNormal_Vector->addAction(actionFace);
+        menuFunctions->addAction(actionAdd_Noise);
         menuFunctions->addAction(actionDenoising);
+        menuFunctions->addAction(actionMSE);
+        menuFunctions->addAction(actionClear);
         mainToolBar->addAction(actionOpen);
         mainToolBar->addAction(actionQuit);
 
@@ -193,6 +238,14 @@ public:
         QObject::connect(actionNeighbor_Face_of_Face, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNeighborFoF()));
         QObject::connect(actionFace, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionNormalFromFace()));
         QObject::connect(actionRegionFromPoints, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionRegionFromPoints()));
+        QObject::connect(actionAdd_Noise, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionAddNoise()));
+        QObject::connect(actionDenoising, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionDenoising()));
+        QObject::connect(actionClear, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionClear()));
+        QObject::connect(checkBox_3, SIGNAL(toggled(bool)), DPClass, SLOT(on_checked_noiseObj(bool)));
+        QObject::connect(checkBox_4, SIGNAL(toggled(bool)), DPClass, SLOT(on_checked_denoiseObj(bool)));
+        QObject::connect(checkBox_5, SIGNAL(toggled(bool)), DPClass, SLOT(on_checked_mse(bool)));
+        QObject::connect(checkBox_6, SIGNAL(toggled(bool)), DPClass, SLOT(on_checked_original(bool)));
+        QObject::connect(actionMSE, SIGNAL(triggered()), DPClass, SLOT(on_clicked_actionMSE()));
 
         QMetaObject::connectSlotsByName(DPClass);
     } // setupUi
@@ -209,10 +262,17 @@ public:
         actionFace->setText(QApplication::translate("DPClass", "From Face", Q_NULLPTR));
         actionDenoising->setText(QApplication::translate("DPClass", "Denoising", Q_NULLPTR));
         actionRegionFromPoints->setText(QApplication::translate("DPClass", "Region from Points", Q_NULLPTR));
+        actionAdd_Noise->setText(QApplication::translate("DPClass", "Add Noise", Q_NULLPTR));
+        actionClear->setText(QApplication::translate("DPClass", "Clear", Q_NULLPTR));
+        actionMSE->setText(QApplication::translate("DPClass", "MSE", Q_NULLPTR));
         label->setText(QApplication::translate("DPClass", "Axis", Q_NULLPTR));
         checkBox_2->setText(QApplication::translate("DPClass", "Display", Q_NULLPTR));
         label_2->setText(QApplication::translate("DPClass", "Wire", Q_NULLPTR));
         checkBox->setText(QApplication::translate("DPClass", "Wired", Q_NULLPTR));
+        checkBox_6->setText(QApplication::translate("DPClass", "Original", Q_NULLPTR));
+        checkBox_3->setText(QApplication::translate("DPClass", "noise obj", Q_NULLPTR));
+        checkBox_4->setText(QApplication::translate("DPClass", "denoise obj", Q_NULLPTR));
+        checkBox_5->setText(QApplication::translate("DPClass", "MSE", Q_NULLPTR));
         menu->setTitle(QApplication::translate("DPClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("DPClass", "Edit", Q_NULLPTR));
         menuSelection->setTitle(QApplication::translate("DPClass", "Selection", Q_NULLPTR));

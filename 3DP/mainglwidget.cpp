@@ -12,6 +12,10 @@ MainGLWidget::MainGLWidget(QWidget *parent)
 	obj_model = new ObjModel();
 	toggleWired = false;
 	toggleAxis = true;
+	noiseObj = true;
+	denoiseObj = true;
+	mse = true;
+	original = true;
 
 	leftBtnClk = false;
 	leftBtnLastPos = QPoint(0, 0);
@@ -81,14 +85,6 @@ void MainGLWidget::paintGL()
 
 	}
 	if (obj_model != nullptr) {
-		glColor3f(0.1, 0.1, 0.1);
-		for (int i = 0; i < obj_model->getNumFaces3(); i++) {
-			glBegin(GL_LINE_LOOP);
-			glVertex3d(obj_model->faces3->at(i).v1.x, obj_model->faces3->at(i).v1.y, obj_model->faces3->at(i).v1.z);
-			glVertex3d(obj_model->faces3->at(i).v2.x, obj_model->faces3->at(i).v2.y, obj_model->faces3->at(i).v2.z);
-			glVertex3d(obj_model->faces3->at(i).v3.x, obj_model->faces3->at(i).v3.y, obj_model->faces3->at(i).v3.z);
-			glEnd();
-		}
 		// vertice selections
 		if (obj_model->verticesColor1->size() != 0) {
 			glColor3f(0.9, 0.1, 0.1);
@@ -141,17 +137,85 @@ void MainGLWidget::paintGL()
 			glVertex3f(lines.at(i).v2.x, lines.at(i).v2.y, lines.at(i).v2.z);
 			glEnd();
 		}
-		if (!toggleWired) {
+		// original obj
+		if (original) {
+			glColor3f(0.1, 0.1, 0.1);
 			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
-				if (obj_model->getNumColor() != 0) {
-					color3f c = obj_model->color3->at(i);
-					glColor3f(c.red, c.green, c.blue);
-				}
-				else glColor3f(0.1, 0.7, 0.1);
-				glBegin(GL_TRIANGLES);
+				glBegin(GL_LINE_LOOP);
 				glVertex3d(obj_model->faces3->at(i).v1.x, obj_model->faces3->at(i).v1.y, obj_model->faces3->at(i).v1.z);
 				glVertex3d(obj_model->faces3->at(i).v2.x, obj_model->faces3->at(i).v2.y, obj_model->faces3->at(i).v2.z);
 				glVertex3d(obj_model->faces3->at(i).v3.x, obj_model->faces3->at(i).v3.y, obj_model->faces3->at(i).v3.z);
+				glEnd();
+			}
+			if (!toggleWired) {
+				for (int i = 0; i < obj_model->getNumFaces3(); i++) {
+					if (obj_model->getNumColor() != 0) {
+						color3f c = obj_model->color3->at(i);
+						glColor3f(c.red, c.green, c.blue);
+					}
+					else glColor3f(0.1, 0.7, 0.1);
+					glBegin(GL_TRIANGLES);
+					glVertex3d(obj_model->faces3->at(i).v1.x, obj_model->faces3->at(i).v1.y, obj_model->faces3->at(i).v1.z);
+					glVertex3d(obj_model->faces3->at(i).v2.x, obj_model->faces3->at(i).v2.y, obj_model->faces3->at(i).v2.z);
+					glVertex3d(obj_model->faces3->at(i).v3.x, obj_model->faces3->at(i).v3.y, obj_model->faces3->at(i).v3.z);
+					glEnd();
+				}
+			}
+		}
+		// noise drawing
+		if (noiseObj && obj_model->faces3Noise->size() != 0) {
+			glColor3f(0.1, 0.1, 0.1);
+			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
+				glBegin(GL_LINE_LOOP);
+				glVertex3d(obj_model->faces3Noise->at(i).v1.x, obj_model->faces3Noise->at(i).v1.y, obj_model->faces3Noise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Noise->at(i).v2.x, obj_model->faces3Noise->at(i).v2.y, obj_model->faces3Noise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Noise->at(i).v3.x, obj_model->faces3Noise->at(i).v3.y, obj_model->faces3Noise->at(i).v3.z);
+				glEnd();
+			}
+			for (int i = 0; i < obj_model->faces3Noise->size(); i++) {
+				glColor3f(0.7, 0.7, 0.1);
+				glBegin(GL_TRIANGLES);
+				glVertex3d(obj_model->faces3Noise->at(i).v1.x, obj_model->faces3Noise->at(i).v1.y, obj_model->faces3Noise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Noise->at(i).v2.x, obj_model->faces3Noise->at(i).v2.y, obj_model->faces3Noise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Noise->at(i).v3.x, obj_model->faces3Noise->at(i).v3.y, obj_model->faces3Noise->at(i).v3.z);
+				glEnd();
+			}
+		}
+		// denoise drawing
+		if (denoiseObj && obj_model->faces3Denoise->size() != 0) {
+			glColor3f(0.1, 0.1, 0.1);
+			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
+				glBegin(GL_LINE_LOOP);
+				glVertex3d(obj_model->faces3Denoise->at(i).v1.x, obj_model->faces3Denoise->at(i).v1.y, obj_model->faces3Denoise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v2.x, obj_model->faces3Denoise->at(i).v2.y, obj_model->faces3Denoise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v3.x, obj_model->faces3Denoise->at(i).v3.y, obj_model->faces3Denoise->at(i).v3.z);
+				glEnd();
+			}
+			for (int i = 0; i < obj_model->faces3Denoise->size(); i++) {
+				glColor3f(0.7, 0.1, 0.7);
+				glBegin(GL_TRIANGLES);
+				glVertex3d(obj_model->faces3Denoise->at(i).v1.x, obj_model->faces3Denoise->at(i).v1.y, obj_model->faces3Denoise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v2.x, obj_model->faces3Denoise->at(i).v2.y, obj_model->faces3Denoise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v3.x, obj_model->faces3Denoise->at(i).v3.y, obj_model->faces3Denoise->at(i).v3.z);
+				glEnd();
+			}
+		}
+		// mse drawing
+		if (mse && obj_model->mseColor3->size() != 0) {
+			glColor3f(0.1, 0.1, 0.1);
+			for (int i = 0; i < obj_model->getNumFaces3(); i++) {
+				glBegin(GL_LINE_LOOP);
+				glVertex3d(obj_model->faces3Denoise->at(i).v1.x, obj_model->faces3Denoise->at(i).v1.y, obj_model->faces3Denoise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v2.x, obj_model->faces3Denoise->at(i).v2.y, obj_model->faces3Denoise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v3.x, obj_model->faces3Denoise->at(i).v3.y, obj_model->faces3Denoise->at(i).v3.z);
+				glEnd();
+			}
+			for (int i = 0; i < obj_model->mseColor3->size(); i++) {
+				glColor3f(obj_model->mseColor3->at(i).red, obj_model->mseColor3->at(i).green, obj_model->mseColor3->at(i).blue);
+				glBegin(GL_TRIANGLES);
+				glVertex3d(obj_model->faces3Denoise->at(i).v1.x, obj_model->faces3Denoise->at(i).v1.y, obj_model->faces3Denoise->at(i).v1.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v2.x, obj_model->faces3Denoise->at(i).v2.y, obj_model->faces3Denoise->at(i).v2.z);
+				glVertex3d(obj_model->faces3Denoise->at(i).v3.x, obj_model->faces3Denoise->at(i).v3.y, obj_model->faces3Denoise->at(i).v3.z);
 				glEnd();
 			}
 		}
@@ -193,6 +257,9 @@ void MainGLWidget::neighborFoF(int fId)
 
 void MainGLWidget::regionFromPoints(vector<int> pIds, bool strict)
 {
+	lines = vector<line>(0);
+	obj_model->regionFromPoints(pIds, strict);
+	updateGL();
 }
 
 void MainGLWidget::drawNormalLineFromFace(int fId)
@@ -200,6 +267,31 @@ void MainGLWidget::drawNormalLineFromFace(int fId)
 	lines = vector<line>(0);
 	line norm = obj_model->getNormalLineFromFace(fId);
 	lines.push_back(norm);
+	updateGL();
+}
+
+void MainGLWidget::addNoise(double deviation)
+{
+	obj_model->addNoise(deviation);
+	updateGL();
+}
+
+void MainGLWidget::deNoise()
+{
+	obj_model->deNoise();
+	updateGL();
+}
+
+double MainGLWidget::computeMSE()
+{
+	double mse = obj_model->computeMSE();
+	updateGL();
+	return mse;
+}
+
+void MainGLWidget::clearNoise()
+{
+	obj_model->clearNoise();
 	updateGL();
 }
 

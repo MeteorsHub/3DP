@@ -24,6 +24,10 @@ public:
 	void neighborFoF(int fId);
 	void regionFromPoints(vector<int> pIds, bool strict);
 	void drawNormalLineFromFace(int fId);
+	void addNoise(double deviation);
+	void deNoise();
+	double computeMSE();
+	void clearNoise();
 
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseReleaseEvent(QMouseEvent*) override;
@@ -33,6 +37,10 @@ public:
 	ObjModel *obj_model;
 	bool toggleWired;
 	bool toggleAxis;
+	bool original;
+	bool noiseObj;
+	bool denoiseObj;
+	bool mse;
 
 protected:
 	

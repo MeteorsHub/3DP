@@ -2,17 +2,24 @@
 #include <QTextStream>
 #include <QDebug>
 #include <set>
+#include <random>
 
 ObjModel::ObjModel()
 {
 	this->vertices = new vector<vertice>(0);
 	this->verticesColor1 = new vector<vertice>(0);
 	this->verticesColor2 = new vector<vertice>(0);
+	this->verticesNoise = new vector<vertice>(0);
+	this->verticesDenoise = new vector<vertice>(0);
 	this->faces3 = new vector<face3>(0);
 	this->faces3Color1 = new vector<face3>(0);
 	this->faces3Color2 = new vector<face3>(0);
+	this->faces3Noise = new vector<face3>(0);
+	this->faces3Denoise = new vector<face3>(0);
+	this->faces3id = new vector<face3id>(0);
 	this->color = new vector<float>(0);
 	this->color3 = new vector<color3f>(0);
+	this->mseColor3 = new vector<color3f>(0);
 	this->colorMode = ColorFileLoader::ORIGINAL;
 }
 
@@ -21,6 +28,8 @@ ObjModel::~ObjModel()
 	delete this->faces3;
 	delete this->faces3Color1;
 	delete this->faces3Color2;
+	delete this->faces3Noise;
+	delete this->faces3Denoise;
 	delete this->vertices;
 	delete this->verticesColor1;
 	delete this->verticesColor2;
@@ -29,6 +38,8 @@ ObjModel::~ObjModel()
 	this->faces3 = nullptr;
 	this->faces3Color1 = nullptr;
 	this->faces3Color2 = nullptr;
+	this->faces3Noise = nullptr;
+	this->faces3Denoise = nullptr;
 	this->vertices = nullptr;
 	this->verticesColor1 = nullptr;
 	this->verticesColor2 = nullptr;
@@ -74,9 +85,14 @@ bool ObjModel::loadObjFile(QString filename) {
 				return false;
 			}
 			face3 f3;
+			face3id f3id;
 			f3.v1 = this->vertices->at(list[1].toInt() - 1);
+			f3id.vId1 = list[1].toInt() - 1;
 			f3.v2 = this->vertices->at(list[2].toInt() - 1);
+			f3id.vId2 = list[2].toInt() - 1;
 			f3.v3 = this->vertices->at(list[3].toInt() - 1);
+			f3id.vId3 = list[3].toInt() - 1;
+			this->faces3id->push_back(f3id);
 			this->faces3->push_back(f3);
 		}
 		else {
@@ -119,6 +135,7 @@ bool ObjModel::loadColorFile(QString filename)
 		return false;
 	}
 	unselect();
+	clearNoise();
 	setColor3f();
 	file.close();
 	return true;
@@ -134,15 +151,26 @@ void ObjModel::setColor3f()
 {
 	if (getNumColor() == 0) {
 		for (int i = 0; i < getNumFaces3(); i++) {
-			float *c = getColor3f(1.0f);
+			float *c = getColor3f(1.0f, ColorFileLoader::ORIGINAL);
 			color3f cf = { c[0], c[1], c[2] };
 			color3->push_back(cf);
 		}
 	}
 	else {
 		color3->clear();
+		// transform color scale to [-1, 1]
+		float min = *std::min_element(color->begin(), color->end());
+		float max = *std::max_element(color->begin(), color->end());
+		float k = (1.0f - (-1.0f)) / (max - min);
+		float b = -k * min - 1.0f;
 		for (int i = 0; i < getNumColor(); i++) {
-			float *c = getColor3f(color->at(i));
+			double grayscale;
+			if (this->colorMode == ColorFileLoader::CONTINUOUS)
+				grayscale = color->at(i);
+			else
+				grayscale = std::roundf(color->at(i));
+			grayscale = k * (grayscale) + b;
+			float *c = getColor3f(grayscale, this->colorMode);
 			color3f cf = { c[0], c[1], c[2] };
 			color3->push_back(cf);
 		}
@@ -194,6 +222,112 @@ void ObjModel::neighborFoF(int fId)
 	}
 }
 
+void ObjModel::regionFromPoints(vector<int> pIds, bool strict)
+{
+	this->unselect();
+	for (int i = 0; i < getNumFaces3(); i++) {
+		int id1 = getVerticeId(faces3->at(i).v1);
+		int id2 = getVerticeId(faces3->at(i).v2);
+		int id3 = getVerticeId(faces3->at(i).v3);
+		vertice v3 = faces3->at(i).v3;
+		int count = 0;
+		if (std::find(pIds.begin(), pIds.end(), id1) != pIds.end())
+			count++;
+		if (std::find(pIds.begin(), pIds.end(), id2) != pIds.end())
+			count++;
+		if (std::find(pIds.begin(), pIds.end(), id3) != pIds.end())
+			count++;
+		if (strict && count == 3)
+			faces3Color1->push_back(faces3->at(i));
+		if (!strict && count >= 2)
+			faces3Color1->push_back(faces3->at(i));
+	}
+}
+
+void ObjModel::addNoise(double deviation)
+{
+	this->clearNoise();
+	std::default_random_engine g;
+	std::normal_distribution<double> d(0.0, deviation);
+	for (int i = 0; i < getNumVertices(); i++) {
+		verticesNoise->push_back(noiseVertice(i, d(g), d(g), d(g)));
+	}
+	for (int i = 0; i < faces3id->size(); i++) {
+		face3 f;
+		vertice v;
+		f.v1 = verticesNoise->at(faces3id->at(i).vId1);
+		f.v2 = verticesNoise->at(faces3id->at(i).vId2);
+		f.v3 = verticesNoise->at(faces3id->at(i).vId3);
+		faces3Noise->push_back(f);
+	}
+}
+
+void ObjModel::deNoise()
+{
+	delete faces3Denoise, verticesDenoise;
+	faces3Denoise = new vector<face3>(0);
+	verticesDenoise = new vector<vertice>(0);
+	if (faces3Noise->size() == 0)
+		return;
+	for (int i = 0; i < verticesNoise->size(); i++) {
+		vertice v = denoiseVertice(i, getNormalLineFromVertice(i, true));
+		verticesDenoise->push_back(v);
+	}
+	for (int i = 0; i < faces3id->size(); i++) {
+		face3 f;
+		vertice v;
+		f.v1 = verticesDenoise->at(faces3id->at(i).vId1);
+		f.v2 = verticesDenoise->at(faces3id->at(i).vId2);
+		f.v3 = verticesDenoise->at(faces3id->at(i).vId3);
+		faces3Denoise->push_back(f);
+	}
+}
+
+double ObjModel::computeMSE()
+{
+	delete mseColor3;
+	mseColor3 = new vector<color3f>(0);
+	if (verticesNoise->size() == 0 || verticesDenoise->size() == 0)
+		return 0;
+	vector<double> delta(getNumVertices());
+	for (int i = 0; i < getNumVertices(); i++) {
+		delta[i] = pow((vertices->at(i) - verticesDenoise->at(i)).mod(), 2);
+	}
+	
+	double sum = 0.0;
+	for (int i = 0; i < delta.size(); i++) {
+		sum += delta[i];
+	}
+	// compute mean delta of a face
+	vector<double> deltaFace(getNumFaces3());
+	for (int i = 0; i < getNumFaces3(); i++) {
+		face3id f = faces3id->at(i);
+		double deltaMean = 0;
+		deltaMean += delta[f.vId1];
+		deltaMean += delta[f.vId2];
+		deltaMean += delta[f.vId3];
+		deltaFace[i] = deltaMean;
+	}
+	double maxe = *std::max_element(deltaFace.begin(), deltaFace.end());
+	for (int i = 0; i < deltaFace.size(); i++) {
+		float* color = getColor3f(2 * (deltaFace[i] / maxe) - 1.0, ColorFileLoader::CONTINUOUS);
+		color3f c;
+		c.red = color[0]; c.green = color[1]; c.blue = color[2];
+		mseColor3->push_back(c);
+	}
+	return sum / getNumVertices();
+}
+
+void ObjModel::clearNoise()
+{
+	delete faces3Noise, faces3Denoise, verticesNoise, verticesDenoise, mseColor3;
+	faces3Noise = new vector<face3>(0);
+	faces3Denoise = new vector<face3>(0);
+	verticesNoise = new vector<vertice>(0);
+	verticesDenoise = new vector<vertice>(0);
+	mseColor3 = new vector<color3f>(0);
+}
+
 bool ObjModel::loadOffFile(QString filename)
 {
 	QFile file(filename);
@@ -238,12 +372,18 @@ bool ObjModel::loadOffFile(QString filename)
 			return false;
 		}
 		face3 f3;
+		face3id f3id;
 		f3.v1 = this->vertices->at(list[1].toInt());
+		f3id.vId1 = list[1].toInt();
 		f3.v2 = this->vertices->at(list[2].toInt());
+		f3id.vId2 = list[2].toInt();
 		f3.v3 = this->vertices->at(list[3].toInt());
+		f3id.vId3 = list[3].toInt();
 		this->faces3->push_back(f3);
+		this->faces3id->push_back(f3id);
 	}
 	unselect();
+	clearNoise();
 	setColor3f();
 	file.close();
 	return true;
@@ -351,9 +491,13 @@ int ObjModel::getVerticeId(vertice v)
 	return -1;
 }
 
-line ObjModel::getNormalLineFromFace(int fId)
+line ObjModel::getNormalLineFromFace(int fId, bool isNoise)
 {
-	face3 face = faces3->at(fId);
+	face3 face;
+	if (isNoise && faces3Noise->size() != 0)
+		face = faces3Noise->at(fId);
+	else
+		face = faces3->at(fId);
 	double a, b, c;
 	double r;
 	vertice vc1, vc2;
@@ -380,9 +524,61 @@ line ObjModel::getNormalLineFromFace(int fId)
 	return l;
 }
 
-float * ObjModel::getColor3f(float grayScale)
+line ObjModel::getNormalLineFromVertice(int vId, bool isNoise)
 {
+	vector<int> neighbor = getNeighborFoP(vId);
+	vertice sum(0, 0, 0);
+	for (int i = 0; i < neighbor.size(); i++) {
+		line norm = getNormalLineFromFace(neighbor.at(i), isNoise);
+		sum = sum + (norm.v2 - norm.v1);
+	}
+	line l;
+	if (isNoise)
+		l.v1 = verticesNoise->at(vId);
+	else
+		l.v1 = vertices->at(vId);
+	l.v2 = l.v1 + sum;
+	return l;
+}
+
+vertice ObjModel::noiseVertice(int vId, double b1, double b2, double b3)
+{
+	vertice v;
+	v.x = vertices->at(vId).x + b1;
+	v.y = vertices->at(vId).y + b2;
+	v.z = vertices->at(vId).z + b3;
+	return v;
+}
+
+vertice ObjModel::denoiseVertice(int vId, line norm)
+{
+	double sigma_c = 0.01;
+	double sigma_s = 0.01;
+	vertice v = verticesNoise->at(vId);
+	vertice n = norm.v2 - norm.v1;
+	vector<int> qIds = getNeighborPoP(vId);
+	vector<vertice> qs(0);
+	for (int i = 0; i < qIds.size(); i++) 
+		qs.push_back(verticesNoise->at(qIds[i]));
+	double sum = 0.0;
+	double normalizer = 0.0;
+	for (int i = 0; i < qs.size(); i++) {
+		double t = (v - qs[i]).mod();
+		double h = n.dotProduct(qs[i]);
+		double wc = exp(-t * t / (2 * (sigma_c*sigma_c)));
+		double ws = exp(-h * h / (2 * (sigma_s*sigma_s)));
+		sum += wc * ws * h;
+		normalizer += wc * ws;
+	}
+	return v+(n*(sum/normalizer));
+}
+
+float * ObjModel::getColor3f(float grayScale, ColorFileLoader::COLOR_MODE colorMode)
+{
+	// grayscale is [-1, 1]
 	float* color3f = new float[3];
+	if (grayScale > 1.0f) grayScale = 1.0f;
+	if (grayScale < -1.0f) grayScale = -1.0f;
 	auto interpolate = [](float val, float y0, float x0, float y1, float x1) {
 		return (val - x0)*(y1 - y0) / (x1 - x0) + y0;
 	};
@@ -405,7 +601,7 @@ float * ObjModel::getColor3f(float grayScale)
 		return base(gray + 0.5f);
 	};
 
-	switch (this->colorMode)
+	switch (colorMode)
 	{
 	case ColorFileLoader::ORIGINAL:
 		color3f[0] = 0.1;
@@ -413,13 +609,11 @@ float * ObjModel::getColor3f(float grayScale)
 		color3f[2] = 0.1;
 		return color3f;
 	case ColorFileLoader::CONTINUOUS:
-		grayScale = this->transformColorGray(grayScale);
 		color3f[0] = red(grayScale);
 		color3f[1] = green(grayScale);
 		color3f[2] = blue(grayScale);
 		return color3f;
 	case ColorFileLoader::DISCRETE:
-		grayScale = this->transformColorGray(std::roundf(grayScale));
 		color3f[0] = red(grayScale);
 		color3f[1] = green(grayScale);
 		color3f[2] = blue(grayScale);
@@ -431,15 +625,3 @@ float * ObjModel::getColor3f(float grayScale)
 		return color3f;
 	}
 }
-
-float ObjModel::transformColorGray(float grayScale)
-{
-	// transform color scale to [-1, 1]
-	float min = *std::min_element(color->begin(), color->end());
-	float max = *std::max_element(color->begin(), color->end());
-	float k = (1.0f - (-1.0f)) / (max - min);
-	float b = -k * min - 1.0f;
-
-	return k * grayScale + b;
-}
-
