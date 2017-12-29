@@ -30,6 +30,11 @@ struct vertice {
 		return sqrt(x*x + y * y + z * z);
 	}
 
+	vertice normal() {
+		double length = this->mod();
+		return vertice(x / length, y / length, z / length);
+	}
+
 	double dotProduct(const vertice &other) const {
 		return x * other.x + y * other.y + z * other.z;
 	}
@@ -44,6 +49,9 @@ struct vertice {
 	}
 	vertice operator*(const double k) const {
 		return vertice(x * k, y * k, z * k);
+	}
+	vertice operator/(const double k) const {
+		return vertice(x / k, y / k, z / k);
 	}
 };
 
@@ -89,7 +97,7 @@ public:
 	void neighborFoF(int fId);
 	void regionFromPoints(vector<int> pIds, bool strict=true);
 	void addNoise(double deviation);
-	void deNoise();
+	void deNoise(double sigma);
 	double computeMSE();
 	void clearNoise();
 
@@ -105,7 +113,7 @@ public:
 	line getNormalLineFromFace(int fId, bool isNoise=false);
 	line getNormalLineFromVertice(int vId, bool isNoise=false);
 	vertice noiseVertice(int vId, double b1, double b2, double b3);
-	vertice denoiseVertice(int vId, line norm);
+	vertice denoiseVertice(int vId, vertice n);
 
 	float* getColor3f(float, ColorFileLoader::COLOR_MODE);
 

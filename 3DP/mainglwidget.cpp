@@ -276,9 +276,9 @@ void MainGLWidget::addNoise(double deviation)
 	updateGL();
 }
 
-void MainGLWidget::deNoise()
+void MainGLWidget::deNoise(double sigma)
 {
-	obj_model->deNoise();
+	obj_model->deNoise(sigma);
 	updateGL();
 }
 

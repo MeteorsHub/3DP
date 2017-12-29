@@ -25,7 +25,7 @@ public:
 	void regionFromPoints(vector<int> pIds, bool strict);
 	void drawNormalLineFromFace(int fId);
 	void addNoise(double deviation);
-	void deNoise();
+	void deNoise(double sigma);
 	double computeMSE();
 	void clearNoise();
 

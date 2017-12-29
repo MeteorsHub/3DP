@@ -179,7 +179,7 @@ void DP::on_clicked_actionAddNoise()
 {
 	QString title = "Add noise";
 	InputDialog dialog(this, title);
-	QString info = "Input the deviation (ie. 0.05)";
+	QString info = "Input the deviation (ie. 0.01)";
 	dialog.setInfoText(info);
 	if (dialog.exec() == QDialog::Accepted) {
 		QString inputText = dialog.getInputText();
@@ -194,7 +194,20 @@ void DP::on_clicked_actionAddNoise()
 
 void DP::on_clicked_actionDenoising()
 {
-	this->ui.mainglwidget->deNoise();
+	QString title = "Gaussian denoising";
+	InputDialog dialog(this, title);
+	QString info = "Input the gaussian filter sigma parameter (ie. 0.01)";
+	dialog.setInfoText(info);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString inputText = dialog.getInputText();
+		double sigma = inputText.toDouble();
+		if (sigma <= 0.0) {
+			QMessageBox::warning(this, "Input Invalid Format", "Please input a double greater than 0");
+			return;
+		}
+		this->ui.mainglwidget->deNoise(sigma);
+	}
+	
 }
 
 void DP::on_clicked_actionMSE()

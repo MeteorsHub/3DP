@@ -50,15 +50,19 @@ ObjModel::~ObjModel()
 
 bool ObjModel::loadObjFile(QString filename) {
 	QFile file(filename);
+	unselect();
+	clearNoise();
+	
 
 	if (!file.open(QFile::ReadOnly | QFile::Text)) {
 		file.close();
 		return false;
 	}
 	if (getNumVertices() != 0) {
-		delete vertices, faces3;
+		delete vertices, faces3, faces3id;
 		this->vertices = new vector<vertice>(0);
 		this->faces3 = new vector<face3>(0);
+		this->faces3id = new vector<face3id>(0);
 	}
 	QTextStream in(&file);
 	while (!in.atEnd()) {
@@ -99,7 +103,7 @@ bool ObjModel::loadObjFile(QString filename) {
 			qDebug() << "unknown line of obj file " << line;
 		}
 	}
-	unselect();
+	
 	setColor3f();
 	file.close();
 	return true;
@@ -262,16 +266,60 @@ void ObjModel::addNoise(double deviation)
 	}
 }
 
-void ObjModel::deNoise()
+void ObjModel::deNoise(double sigma)
 {
 	delete faces3Denoise, verticesDenoise;
 	faces3Denoise = new vector<face3>(0);
 	verticesDenoise = new vector<vertice>(0);
 	if (faces3Noise->size() == 0)
 		return;
-	for (int i = 0; i < verticesNoise->size(); i++) {
-		vertice v = denoiseVertice(i, getNormalLineFromVertice(i, true));
-		verticesDenoise->push_back(v);
+	// compute normal lines
+	vector<std::set<int>> neighborFaceids(getNumVertices());
+	vector<std::set<int>> neighborVerticeids(getNumVertices());
+	for (int i = 0; i < getNumFaces3(); i++) {
+		face3id f3id = faces3id->at(i);
+		neighborFaceids[f3id.vId1].insert(i);
+		neighborFaceids[f3id.vId2].insert(i);
+		neighborFaceids[f3id.vId3].insert(i);
+		neighborVerticeids[f3id.vId1].insert(f3id.vId2);
+		neighborVerticeids[f3id.vId1].insert(f3id.vId3);
+		neighborVerticeids[f3id.vId2].insert(f3id.vId1);
+		neighborVerticeids[f3id.vId2].insert(f3id.vId3);
+		neighborVerticeids[f3id.vId3].insert(f3id.vId1);
+		neighborVerticeids[f3id.vId3].insert(f3id.vId2);
+	}
+	
+	for (int i = 0; i < neighborFaceids.size(); i++) {
+		vertice n(0, 0, 0);
+		for (std::set<int>::iterator j = neighborFaceids[i].begin(); j != neighborFaceids[i].end();j++) {
+			int fid = *j;
+			line norm = getNormalLineFromFace(fid, true);
+			n = n + (norm.v2 - norm.v1);
+		}
+		n = n.normal();
+		// denoising
+		double sigma_c = sigma;
+		double sigma_s = sigma;
+		vertice v = verticesNoise->at(i);
+		vector<int> qIds;
+		std::copy(neighborVerticeids[i].begin(), neighborVerticeids[i].end(), std::back_inserter(qIds));
+		vector<vertice> qs(0);
+		for (int j = 0; j < qIds.size(); j++)
+			qs.push_back(verticesNoise->at(qIds[j]));
+		double sum = 0.0;
+		double normalizer = 0.0;
+		for (int j = 0; j < qs.size(); j++) {
+			double t = (v - qs[j]).mod();
+			double h = n.dotProduct(v - qs[j]);
+			double wc = exp(-t * t / (2 * (sigma_c*sigma_c)));
+			double ws = exp(-h * h / (2 * (sigma_s*sigma_s)));
+			sum += wc * ws * h;
+			normalizer += wc * ws;
+		}
+		vertice blend = n * (sum / normalizer);
+		vertice v_ = v - blend;
+		verticesDenoise->push_back(v_);
+		
 	}
 	for (int i = 0; i < faces3id->size(); i++) {
 		face3 f;
@@ -330,6 +378,8 @@ void ObjModel::clearNoise()
 
 bool ObjModel::loadOffFile(QString filename)
 {
+	unselect();
+	clearNoise();
 	QFile file(filename);
 
 	if (!file.open(QFile::ReadOnly | QFile::Text)) {
@@ -338,9 +388,10 @@ bool ObjModel::loadOffFile(QString filename)
 	}
 
 	if (getNumVertices() != 0) {
-		delete vertices, faces3;
+		delete vertices, faces3, faces3id;
 		this->vertices = new vector<vertice>(0);
 		this->faces3 = new vector<face3>(0);
+		this->faces3id = new vector<face3id>(0);
 	}
 	QTextStream in(&file);
 	if (in.readLine() != "OFF") {
@@ -382,8 +433,7 @@ bool ObjModel::loadOffFile(QString filename)
 		this->faces3->push_back(f3);
 		this->faces3id->push_back(f3id);
 	}
-	unselect();
-	clearNoise();
+	
 	setColor3f();
 	file.close();
 	return true;
@@ -413,10 +463,10 @@ vector<int> ObjModel::getNeighborPoP(int pId)
 	std::set<int> pIds;
 	for (int i = 0; i < getNumFaces3(); i++) {
 		if (isVerticeInFace(pId, i)) {
-			face3 face = faces3->at(i);
-			pIds.insert(getVerticeId(face.v1));
-			pIds.insert(getVerticeId(face.v2));
-			pIds.insert(getVerticeId(face.v3));
+			face3id fids = faces3id->at(i);
+			pIds.insert(fids.vId1);
+			pIds.insert(fids.vId2);
+			pIds.insert(fids.vId3);
 		}
 	}
 	pIds.erase(pId);
@@ -453,13 +503,12 @@ vector<int> ObjModel::getNeighborFoF(int fId)
 
 bool ObjModel::isVerticeInFace(int vId, int fId)
 {
-	face3 face = faces3->at(fId);
-	vertice v = vertices->at(vId);
-	if (face.v1 == v)
+	face3id f3id = faces3id->at(fId);
+	if (f3id.vId1 == vId)
 		return true;
-	if (face.v2 == v)
+	if (f3id.vId2 == vId)
 		return true;
-	if (face.v3 == v)
+	if (f3id.vId3 == vId)
 		return true;
 	return false;
 }
@@ -514,7 +563,7 @@ line ObjModel::getNormalLineFromFace(int fId, bool isNoise)
 	a = vc1.y*vc2.z - vc2.y*vc1.z;
 	b = vc2.x*vc1.z - vc1.x*vc2.z;
 	c = vc1.x*vc2.y - vc2.x*vc1.y;
-	r = 50 * sqrt(a*a + b * b + c * c);
+	r = sqrt(a*a + b * b + c * c);
 	norm1.x = a / r + norm0.x;
 	norm1.y = b / r + norm0.y;
 	norm1.z = c / r + norm0.z;
@@ -537,7 +586,7 @@ line ObjModel::getNormalLineFromVertice(int vId, bool isNoise)
 		l.v1 = verticesNoise->at(vId);
 	else
 		l.v1 = vertices->at(vId);
-	l.v2 = l.v1 + sum;
+	l.v2 = l.v1 + sum/double(neighbor.size());
 	return l;
 }
 
@@ -550,12 +599,11 @@ vertice ObjModel::noiseVertice(int vId, double b1, double b2, double b3)
 	return v;
 }
 
-vertice ObjModel::denoiseVertice(int vId, line norm)
+vertice ObjModel::denoiseVertice(int vId, vertice n)
 {
-	double sigma_c = 0.01;
-	double sigma_s = 0.01;
+	double sigma_c = 0.05;
+	double sigma_s = 0.05;
 	vertice v = verticesNoise->at(vId);
-	vertice n = norm.v2 - norm.v1;
 	vector<int> qIds = getNeighborPoP(vId);
 	vector<vertice> qs(0);
 	for (int i = 0; i < qIds.size(); i++) 
@@ -564,13 +612,15 @@ vertice ObjModel::denoiseVertice(int vId, line norm)
 	double normalizer = 0.0;
 	for (int i = 0; i < qs.size(); i++) {
 		double t = (v - qs[i]).mod();
-		double h = n.dotProduct(qs[i]);
+		double h = n.dotProduct(v - qs[i]);
 		double wc = exp(-t * t / (2 * (sigma_c*sigma_c)));
 		double ws = exp(-h * h / (2 * (sigma_s*sigma_s)));
 		sum += wc * ws * h;
 		normalizer += wc * ws;
 	}
-	return v+(n*(sum/normalizer));
+	vertice blend = n * (sum / normalizer);
+	vertice v_ = v - blend;
+	return v_;
 }
 
 float * ObjModel::getColor3f(float grayScale, ColorFileLoader::COLOR_MODE colorMode)
