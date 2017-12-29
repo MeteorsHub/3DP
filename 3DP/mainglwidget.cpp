@@ -266,6 +266,7 @@ void MainGLWidget::drawNormalLineFromFace(int fId)
 {
 	lines = vector<line>(0);
 	line norm = obj_model->getNormalLineFromFace(fId);
+	norm.v2 = norm.v1 + (norm.v2 - norm.v1)/50;
 	lines.push_back(norm);
 	updateGL();
 }
