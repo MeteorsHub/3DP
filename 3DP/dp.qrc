@@ -1,7 +1,0 @@
-<RCC>
-  <qresource prefix="DP"/>
-  <qresource prefix="icon">
-    <file>Resources/icon/exit.png</file>
-    <file>Resources/icon/open-folder-with-document.png</file>
-  </qresource>
-</RCC>
